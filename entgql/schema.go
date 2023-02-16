@@ -574,7 +574,7 @@ func (e *schemaGenerator) buildMutationInputs(t *gen.Type, ant *Annotation, gqlT
 			if err != nil {
 				return nil, err
 			}
-			scalar := e.mapScalar(gqlType, f.Field, ant, inputObjectFilter)
+			scalar := e.mapMutationScalar(gqlType, f.Field, ant, inputObjectFilter)
 			if scalar == "" {
 				return nil, fmt.Errorf("%s is not supported as input for %s", f.Name, def.Name)
 			}
@@ -704,11 +704,28 @@ func (e *schemaGenerator) typeFromField(gqlType string, f *gen.Field, ant *Annot
 	}
 }
 
-// mapScalar provides maps an ent.Schema type into GraphQL scalar type.
+// mapMutationScalar provides maps an ent.Schema type into GraphQL scalar type for mutations.
+func (e *schemaGenerator) mapMutationScalar(gqlType string, f *gen.Field, ant *Annotation, typeFilter func(string) bool) string {
+	if ant != nil {
+		if ant.MutationType != "" {
+			return ant.MutationType
+		} else if ant.Type != "" {
+			// included for backwards compatability
+			return ant.Type
+		}
+	}
+	return e.mapScalarRaw(gqlType, f, ant, typeFilter, true)
+}
+
 func (e *schemaGenerator) mapScalar(gqlType string, f *gen.Field, ant *Annotation, typeFilter func(string) bool) string {
 	if ant != nil && ant.Type != "" {
 		return ant.Type
 	}
+	return e.mapScalarRaw(gqlType, f, ant, typeFilter, false)
+}
+
+// mapScalarRaw provides maps an ent.Schema type into GraphQL scalar type.
+func (e *schemaGenerator) mapScalarRaw(gqlType string, f *gen.Field, ant *Annotation, typeFilter func(string) bool, isInput bool) string {
 	scalar := f.Type.String()
 	switch t := f.Type.Type; {
 	case f.Name == "id":
@@ -735,6 +752,9 @@ func (e *schemaGenerator) mapScalar(gqlType string, f *gen.Field, ant *Annotatio
 			scalar = gqlType + scalar
 		}
 		if f.Type.RType != nil && f.Type.RType.Name == "" {
+			if isInput {
+				scalar = scalar + "Input"
+			}
 			switch f.Type.RType.Kind {
 			case reflect.Slice, reflect.Array:
 				if strings.HasPrefix(f.Type.RType.Ident, "[]*") {

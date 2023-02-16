@@ -36,6 +36,8 @@ type (
 		Mapping []string `json:"Mapping,omitempty"`
 		// Type is the underlying GraphQL type name (e.g. Boolean).
 		Type string `json:"Type,omitempty"`
+		// MutationType is the underlying GraphQL type name for mutations (e.g., Boolean).
+		MutationType string `json:"MutationType,omitempty"`
 		// Skip exclude the type
 		Skip SkipMode `json:"Skip,omitempty"`
 		// RelayConnection enables the Relay Connection specification for the entity.
@@ -198,6 +200,21 @@ func MapsTo(names ...string) Annotation {
 //		)
 func Type(name string) Annotation {
 	return Annotation{Type: name}
+}
+
+// MutationType returns a type mapping annotation for mutations.
+// The MutationType() annotation is used to map the underlying
+// GraphQL mutation type to the type.
+//
+// To change the GraphQL mutation type for a type:
+//
+//	func (User) Annotations() []schema.Annotation {
+//		return []schema.Annotation{
+//			entgql.MutationType("MasterUserInput"),
+//		}
+//	}
+func MutationType(name string) Annotation {
+	return Annotation{MutationType: name}
 }
 
 // Skip returns a skip annotation.
@@ -450,6 +467,9 @@ func (a Annotation) Merge(other schema.Annotation) schema.Annotation {
 	}
 	if ant.Type != "" {
 		a.Type = ant.Type
+	}
+	if ant.MutationType != "" {
+		a.MutationType = ant.MutationType
 	}
 	if ant.Skip.Any() {
 		a.Skip |= ant.Skip

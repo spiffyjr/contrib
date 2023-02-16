@@ -94,6 +94,7 @@ input CreateTodoInput {
   priority: Int
   text: String!
   init: Map
+  customp: [CustomPMutationInput]
   parentID: ID
   childIDs: [ID!]
   categoryID: ID
@@ -201,6 +202,9 @@ input UpdateTodoInput {
   text: String
   init: Map
   clearInit: Boolean
+  custom: [CustomInput!]
+  appendCustom: [CustomInput!]
+  clearCustom: Boolean
   parentID: ID
   clearParent: Boolean
   addChildIDs: [ID!]
@@ -451,6 +455,7 @@ input CreateTodoInput {
   priority: Int
   text: String!
   init: Map
+  customp: [CustomPMutationInput]
   parentID: ID
   childIDs: [ID!]
   categoryID: ID
@@ -830,6 +835,9 @@ input UpdateTodoInput {
   text: String
   init: Map
   clearInit: Boolean
+  custom: [CustomInput!]
+  appendCustom: [CustomInput!]
+  clearCustom: Boolean
   parentID: ID
   clearParent: Boolean
   addChildIDs: [ID!]

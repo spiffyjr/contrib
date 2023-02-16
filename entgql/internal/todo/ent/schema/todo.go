@@ -76,13 +76,12 @@ func (Todo) Fields() []ent.Field {
 		field.JSON("custom", []customstruct.Custom{}).
 			Annotations(
 				entgql.Skip(entgql.SkipMutationCreateInput),
-				entgql.Skip(entgql.SkipMutationUpdateInput),
 			).
 			Optional(),
 		field.JSON("customp", []*customstruct.Custom{}).
 			Annotations(
-				entgql.Skip(entgql.SkipMutationCreateInput),
 				entgql.Skip(entgql.SkipMutationUpdateInput),
+				entgql.MutationType("[CustomPMutationInput]"),
 			).
 			Optional(),
 	}
